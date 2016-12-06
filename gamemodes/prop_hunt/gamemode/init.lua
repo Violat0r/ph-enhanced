@@ -4,6 +4,7 @@
 -- Send the required lua files to the client
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("cl_menu.lua")
+AddCSLuaFile("cl_targetid.lua")
 AddCSLuaFile("sh_config.lua")
 AddCSLuaFile("taunts/hunter_taunts.lua")
 AddCSLuaFile("taunts/prop_taunts.lua")
@@ -55,9 +56,11 @@ util.AddNetworkString("ServerUsablePropsToClient")
 util.AddNetworkString("PH_ForceCloseTauntWindow")
 util.AddNetworkString("PH_AllowTauntWindow")
 -- Perhaps force this instead of using convars?
+util.AddNetworkString("PH_BetterPropMovement")
 util.AddNetworkString("PH_CameraCollisions")
 util.AddNetworkString("PH_CustomTauntEnabled")
 util.AddNetworkString("PH_CustomTauntDelay")
+util.AddNetworkString("PH_PlayerHalos")
 
 -- Force Close taunt window function, determined whenever the round ends, or team winning.
 local function ForceCloseTauntWindow(num)
@@ -301,7 +304,7 @@ function GM:ShowSpare1(pl)
 			end
 		until rand_taunt != pl.last_taunt
 		
-		pl.last_taunt_time = CurTime()
+		pl.last_taunt_time = CurTime() + TAUNT_DELAY
 		pl.last_taunt = rand_taunt
 		
 		pl:EmitSound(rand_taunt, 100)
@@ -421,6 +424,11 @@ function GM:Think()
 	
 	-- Extra check here for changes cvars
 	if UPDATE_CVAR_TO_VARIABLE < CurTime() then
+		-- Update better prop movement variable
+		net.Start("PH_BetterPropMovement")
+			net.WriteBool(GetConVar("ph_better_prop_movement"):GetBool())
+		net.Broadcast()
+		
 		-- Update camera collisions variable
 		net.Start("PH_CameraCollisions")
 			net.WriteBool(GetConVar("ph_prop_camera_collisions"):GetBool())
@@ -434,6 +442,11 @@ function GM:Think()
 		-- Update custom taunt delay variable
 		net.Start("PH_CustomTauntDelay")
 			net.WriteInt(GetConVarNumber("ph_customtaunts_delay"), 8) -- 8 bits so we don't send too much information here
+		net.Broadcast()
+		
+		-- Update plhalos enabled variable
+		net.Start("PH_PlayerHalos")
+			net.WriteBool(GetConVar("ph_enable_plhalos"):GetBool())
 		net.Broadcast()
 		
 		-- Make sure to update every so seconds and not constantly

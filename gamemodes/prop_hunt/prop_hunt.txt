@@ -148,6 +148,24 @@
 			"type"		"Numeric"
 			"default"	"6"
 		}
+		
+		16
+		{
+			"name"		"ph_enable_lucky_balls"
+			"text"		"Enable Lucky Balls"
+			"help"		"If you hate lucky balls, we're sorry. :("
+			"type"		"CheckBox"
+			"default"	"1"
+		}
+		
+		17
+		{
+			"name"		"ph_enable_plhalos"
+			"text"		"Allow Player Halos"
+			"help"		"Serverside control for if clients see player halos."
+			"type"		"CheckBox"
+			"default"	"0"
+		}
 	}
 
 }

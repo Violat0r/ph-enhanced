@@ -103,6 +103,10 @@ if !ConVarExists("ph_enable_lucky_balls") then
 	local ph_enable_lucky_balls = CreateConVar("ph_enable_lucky_balls", "1", { FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_NOTIFY }, "If you hate lucky balls, we're sorry. :(")
 end
 
+if !ConVarExists("ph_enable_plhalos") then
+	local ph_enable_plhalos = CreateConVar("ph_enable_plhalos", "0", { FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY }, "Serverside control for if clients see player halos.")
+end
+
 if !ConVarExists("ph_hunter_fire_penalty") then
 	local ph_hunter_fire_penalty = CreateConVar("ph_hunter_fire_penalty", "5", { FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY }, "Health points removed from hunters when they shoot.")
 	local ph_hunter_kill_bonus = CreateConVar("ph_hunter_kill_bonus", "100", { FCVAR_SERVER_CAN_EXECUTE, FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_NOTIFY }, "How much health to give back to the Hunter after killing a prop.")

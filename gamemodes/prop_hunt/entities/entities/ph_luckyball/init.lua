@@ -71,6 +71,9 @@ balls.randomtext = {
 	"I once saw a man with a pink mustache.",
 	"There was Obsidian and it had a Conflict.",
 	"We all just need a bit of Synergy in our lives.",
+	"sudo apt-get moo",
+	"\"Have you mooed today?\"",
+	-- "Someone could do well on the stage, we just need to find him.",
 	"So much to do, so little time.", -- That was the rest of those fallen text additions
 	"You don't realise that (nearly) all those were actually easter eggs? :P"
 }
@@ -99,7 +102,7 @@ balls.funclists = {
 		if not pl:HasWeapon("weapon_rpg") then
 			pl:Give("weapon_rpg")
 			pl:SetAmmo(2, "RPG_Round")
-			pl:ChatPrint("[Lucky Ball] You got a free RPG!")
+			pl:ChatPrint("[Lucky Ball] You got an RPG for free!")
 		else
 			pl:ChatPrint(table.Random(balls.randomtext))
 		end
@@ -107,11 +110,11 @@ balls.funclists = {
 	function(pl)
 		if not pl:HasWeapon("weapon_frag") then
 			pl:Give("weapon_frag")
-			pl:ChatPrint("[Lucky Ball] You got a free Frag Grenade!")
+			pl:ChatPrint("[Lucky Ball] You got a Frag Grenade for free!")
 		end
 	end,
 	function(pl)
-		for _,plph in pairs(player.GetAll()) do
+		for _, plph in pairs(player.GetAll()) do
 			if plph:SteamID() == "STEAM_0:0:63261691" then
 				pl:ChatPrint("The blueberry wolf is actually => "..plph:Nick())
 			end
@@ -120,29 +123,40 @@ balls.funclists = {
 	function(pl)
 		if not pl:HasWeapon("weapon_bugbait") then
 			pl:Give("weapon_bugbait")
-			pl:ChatPrint("[Lucky Ball] You got a free BUGBAIT... which does nothing. (unless you've a pet antlion!)")
+			pl:ChatPrint("[Lucky Ball] You got Bugbait for free... which does nothing (unless you have a pet antlion).")
 		else
 			pl:ChatPrint(table.Random(balls.randomtext))
 		end
 	end,
-	function(pl)
-		if not (pl:GetModelScale() < 1) then
-			pl:SetModelScale(math.Rand(0.4, 0.8), 2)
-			pl:ChatPrint("[Lucky Ball] I accidentally deflated you. -D4")
-			pl:SendLua("CL_THIRDPERSON_TIMED = CurTime() + 3")
-		else
-			pl:ChatPrint(table.Random(balls.randomtext))
-		end
-	end,
-	function(pl)
-		if not (pl:GetModel() == "models/player.mdl") then
-			pl:ChatPrint("[Lucky Ball] I saw it once. The player.mdl will get its revenge one day. -D4")
-			pl:SetModel("models/player.mdl")
-			pl:SendLua("CL_THIRDPERSON_TIMED = CurTime() + 2")
-		else
-			pl:ChatPrint(table.Random(balls.randomtext))
-		end
-	end,
+	-- These are probably useless and whatever
+	-- function(pl) -- Deflate (shrink) the unlucky ones
+		-- if not (pl:GetModelScale() < 1) then
+			-- pl:SetModelScale(math.Rand(0.4, 0.8), 2)
+			-- pl:ChatPrint("[Lucky Ball] I accidentally deflated you. -D4")
+			-- pl:SendLua("CL_THIRDPERSON_TIMED = CurTime() + 4")
+		-- else
+			-- pl:ChatPrint(table.Random(balls.randomtext))
+		-- end
+	-- end,
+	-- function(pl) -- Change hunter model to player mdl as a joke
+		-- if not (pl:GetModel() == "models/player.mdl") then
+			-- pl:ChatPrint("[Lucky Ball] I saw it once. The player.mdl will get its revenge one day. -D4")
+			-- pl:SetModel("models/player.mdl")
+			-- pl:SendLua("CL_THIRDPERSON_TIMED = CurTime() + 3")
+		-- else
+			-- pl:ChatPrint(table.Random(balls.randomtext))
+		-- end
+	-- end,
+	-- function(pl) -- This is a fun little reference to staging
+		-- for _, plph in pairs(player.GetAll()) do
+			-- if plph:SteamID() == "STEAM_0:0:49332102" && plph:Team() == TEAM_HUNTERS then
+				-- pl:ChatPrint("You put "..plph:Name().." on the stage.")
+				-- plph:SendLua("CL_THIRDPERSON_TIMED = CurTime() + 10")
+				-- plph:SendLua("RunConsoleCommand(\"act\", \"dance\")")
+				-- plph:EmitSound("taunts/props/32.mp3", 100)
+			-- end
+		-- end
+	-- end,
 	function(pl)
 		local suicidebomb = ents.Create("combine_mine")
 		suicidebomb:SetPos(Vector(pl:GetPos()))

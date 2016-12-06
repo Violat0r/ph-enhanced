@@ -243,6 +243,36 @@ function ph_BaseMainWindow(ply, cmd, args)
 		txt2:SetText("Enable/Disable halo effect when choosing a prop")
 		txt2:SetSize(400,32)
 		txt2:SetPos(chx + 21, chy - 9)
+		
+		local chk2 = vgui.Create("DCheckBox", panel)
+		local numval = GetConVar("ph_cl_halos"):GetBool()
+		if numval == true then
+			chk2:SetChecked(true)
+			chk2:SetValue(1)
+		else
+			chk2:SetChecked(false)
+			chk2:SetValue(0)
+		end
+		chk2:SetSize(16, 16)
+		chk2:SetPos(10, 140)
+		function chk2:OnChange(bool)
+			if bool == true then
+				RunConsoleCommand("ph_cl_plhalos", "8")
+				notification.AddLegacy("Player Halo effects has been enabled.", NOTIFY_GENERIC, 5)
+				surface.PlaySound("buttons/button9.wav")
+			else
+				RunConsoleCommand("ph_cl_plhalos", "0")
+				notification.AddLegacy("Player Halo effects has been disabled.", NOTIFY_GENERIC, 5)
+				surface.PlaySound("buttons/button19.wav")
+			end
+		end
+		
+		local chx,chy = chk2:GetPos()
+		
+		local txt2 = vgui.Create("DLabel", panel)
+		txt2:SetText("Enable/Disable Halo effects on players (Disables automatically depending)")
+		txt2:SetSize(400,32)
+		txt2:SetPos(chx + 21, chy - 9)
 	
 	tab:AddSheet("Player", panel, "icon16/user_orange.png")
 	end
@@ -290,9 +320,10 @@ function ph_BaseMainWindow(ply, cmd, args)
 		{"Enable Prop Camera Collissions?", 60, "ph_prop_camera_collisions"},
 		{"Enable Freezecam?", 80, "ph_freezecam"},
 		{"Enable Prop Collission?", 100, "ph_prop_collision"},
-		{"Enable Random Additional Models?", 120, "ph_prop_additional_models"},
-		{"Swap Teams Everyround? (Keep this remain checked)", 140, "ph_swap_teams_every_round"},
-		{"Enable Custom Taunts?", 160, "ph_enable_custom_taunts"}
+		{"Swap Teams Everyround? (Keep this remain checked)", 120, "ph_swap_teams_every_round"},
+		{"Enable Custom Taunts?", 140, "ph_enable_custom_taunts"},
+		{"Enable Lucky Balls?", 160, "ph_enable_lucky_balls"},
+		{"Allow Player Halos?", 180, "ph_enable_plhalos"}
 	}
 	
 	function Ph:ShowAdminMenu()
