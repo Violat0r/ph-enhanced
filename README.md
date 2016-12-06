@@ -1,8 +1,6 @@
-# Wolvin's Prop Hunt: Enhanced 14e - Staging
+# Wolvin's Prop Hunt: Enhanced 14e
 
-Current version: 14, Revision: e - Staging, release type: Public
-
-**daunknownman2010-staging branch is additional/upcoming changes done by D4UNKN0WNM4N2010. Wolvin still has control over what is added in the master branch of ph-enhanced, some changes may not make it into the master branch at all.**
+Current version: 14, Revision: e, release type: Public
 
 ### Description
 Prop Hunt: Enhanced is an alternate, newer and enhanced version of the Gamemode from original prop hunt which was broken from last Garry's Mod's March 2015 update and decided to make as fixed and newer. This enhanced version is also pretty similar to the classic one, however several things like new codes, files and new features were added in the gamemode to make it
