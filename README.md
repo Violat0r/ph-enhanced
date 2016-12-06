@@ -1,6 +1,7 @@
 # Wolvin's Prop Hunt: Enhanced 14e - Staging
 
 Current version: 14, Revision: e - Staging, release type: Public
+
 **The daunknownman2010-staging branch is upcoming changes done by D4UNKN0WNM4N2010 on Steam**
 
 ### Description
