@@ -1,4 +1,4 @@
-"Gamemode"
+"prop_hunt"
 {
 	"base"		"base"
 	"title"		"Prop Hunt"
@@ -115,21 +115,14 @@
 		
 		12
 		{
-			"name"		"ph_prop_additional_models"
-			"text"		"Team Props Additional Models"
-			"help"		"Should Team Props have different starting models instead of Kleiner?"
-			"type"		"CheckBox"
-			"default"	"0"
-		}
-		13
-		{
 			"name"		"ph_use_custom_plmodel"
 			"text"		"Hunters Custom Models"
 			"help"		"Should Team Hunters have Custom models?"
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		14
+		
+		13
 		{
 			"name"		"ph_use_custom_plmodel_for_prop"
 			"text"		"Props Custom Models"
@@ -137,7 +130,8 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		15
+		
+		14
 		{
 			"name"		"ph_enable_custom_taunts"
 			"text"		"Custom Taunts"
@@ -145,7 +139,8 @@
 			"type"		"CheckBox"
 			"default"	"0"
 		}
-		16
+		
+		15
 		{
 			"name"		"ph_customtaunts_delay"
 			"text"		"Custom Taunts delay"

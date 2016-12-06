@@ -1,6 +1,29 @@
+-- Include these
 include("sh_init.lua")
 include("sh_showwindowtaunt.lua")
 include("cl_menu.lua")
+
+-- Convars are bad at networking sometimes
+CL_CAMERA_COLLISIONS = false
+
+-- Glimpse of thirdperson (Timed)
+CL_THIRDPERSON_TIMED = 0
+
+-- Add some network stuff here (dirty code sry)
+function PH_CameraCollisions(len)
+	CL_CAMERA_COLLISIONS = net.ReadBool()
+end
+net.Receive("PH_CameraCollisions", PH_CameraCollisions)
+
+function PH_CustomTauntEnabled(len)
+	CUSTOM_TAUNT_ENABLED = net.ReadBool()
+end
+net.Receive("PH_CustomTauntEnabled", PH_CustomTauntEnabled)
+
+function PH_CustomTauntDelay(len)
+	CUSTOM_TAUNT_DELAY = net.ReadInt(8)
+end
+net.Receive("PH_CustomTauntDelay", PH_CustomTauntDelay)
 
 -- Decides where  the player view should be (forces third person for props)
 function GM:CalcView(pl, origin, angles, fov)
@@ -20,28 +43,20 @@ function GM:CalcView(pl, origin, angles, fov)
  	
  	-- Give the active weapon a go at changing the viewmodel position 
 	if pl:Team() == TEAM_PROPS && pl:Alive() then
-		if GetConVar("ph_prop_camera_collisions"):GetBool() then
+		if CL_CAMERA_COLLISIONS then
 			local trace = {}
-			local TraceOffset = math.Clamp(hullz, 0, 4)
 			
-			-- Fix camera collision bugs for smaller prop size.
-			if hullz <= 32 then
-				hullz = 36
-			end
-
 			trace.start = origin + Vector(0, 0, hullz - 60)
 			trace.endpos = origin + Vector(0, 0, hullz - 60) + (angles:Forward() * -80)
 			trace.filter = client_prop_model && ents.FindByClass("ph_prop")
-			trace.mins = Vector(-TraceOffset, -TraceOffset, -TraceOffset)
-			trace.maxs = Vector(TraceOffset, TraceOffset, TraceOffset)
 			local tr = util.TraceLine(trace)
-
+			
 			view.origin = tr.HitPos
 		else
 			view.origin = origin + Vector(0, 0, hullz - 60) + (angles:Forward() * -80)
 		end
-	else
-	-- hunter here
+	elseif pl:Team() == TEAM_HUNTERS && pl:Alive() then
+		-- hunter here
 	 	local wep = pl:GetActiveWeapon() 
 	 	if wep && wep != NULL then 
 	 		local func = wep.GetViewModelPosition 
@@ -54,6 +69,20 @@ function GM:CalcView(pl, origin, angles, fov)
 	 			view.origin, view.angles, view.fov = func(wep, pl, origin*1, angles*1, fov) -- Note: *1 to copy the object so the child function can't edit it. 
 	 		end 
 	 	end
+		-- hunter glimpse of thirdperson
+		if CL_THIRDPERSON_TIMED > CurTime() then
+			local trace = {}
+			
+			trace.start = origin
+			trace.endpos = origin + (angles:Forward() * -80)
+			trace.filter = player.GetAll()
+			trace.maxs = Vector(4, 4, 4)
+			trace.mins = Vector(-4, -4, -4)
+			local tr = util.TraceHull(trace)
+			
+			view.drawviewer = true
+			view.origin = tr.HitPos
+		end
 	end
  	
  	return view 
@@ -188,7 +217,6 @@ usermessage.Hook("SetHull", SetHull)
 -- Player has a client-side prop model
 function ClientPropSpawn(um)
 	client_prop_model = ents.CreateClientProp("models/player/kleiner.mdl")
-	-- client_prop_model = ents.CreateClientProp(LocalPlayer():GetPlayerPropEntity():GetModel())
 end
 usermessage.Hook("ClientPropSpawn", ClientPropSpawn)
 
@@ -208,7 +236,7 @@ function GM:Think()
 	for _, pl in pairs(team.GetPlayers(TEAM_PROPS)) do
 		if GetConVar("ph_better_prop_movement"):GetBool() then
 			if LocalPlayer() && LocalPlayer():IsValid() && LocalPlayer():Alive() && LocalPlayer():GetPlayerPropEntity() && LocalPlayer():GetPlayerPropEntity():IsValid() && client_prop_model && client_prop_model:IsValid() then
-				if (client_prop_model:GetModel() == "models/player/kleiner.mdl") || table.HasValue(ADDITIONAL_STARTING_MODELS, client_prop_model:GetModel()) then
+				if client_prop_model:GetModel() == "models/player/kleiner.mdl" then
 					client_prop_model:SetPos(LocalPlayer():GetPos())
 				else
 					client_prop_model:SetPos(LocalPlayer():GetPos() - Vector(0, 0, LocalPlayer():GetPlayerPropEntity():OBBMins().z))

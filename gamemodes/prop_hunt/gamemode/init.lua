@@ -30,6 +30,9 @@ USABLE_PROP_ENTITIES = {
 -- Voice Control Constant init
 VOICE_IS_END_ROUND = 0
 
+-- Update cvar to variables changes every so seconds
+UPDATE_CVAR_TO_VARIABLE = 0
+
 -- Player Join/Leave message
 -- Player Dis/Connect Event Listener
 gameevent.Listen( "player_connect" )
@@ -51,6 +54,10 @@ util.AddNetworkString("ServerUsablePropsToClient")
 -- Additional network string for Custom Taunts window
 util.AddNetworkString("PH_ForceCloseTauntWindow")
 util.AddNetworkString("PH_AllowTauntWindow")
+-- Perhaps force this instead of using convars?
+util.AddNetworkString("PH_CameraCollisions")
+util.AddNetworkString("PH_CustomTauntEnabled")
+util.AddNetworkString("PH_CustomTauntDelay")
 
 -- Force Close taunt window function, determined whenever the round ends, or team winning.
 local function ForceCloseTauntWindow(num)
@@ -207,7 +214,7 @@ local playerModels = {
 function GM:PlayerSetModel(pl)
 	-- set antlion gib small for Prop model. 
 	-- Do not change this into others because this might purposed as a hitbox for props.
-	local player_model = "models/Gibs/Antlion_gib_small_3.mdl"
+	local player_model = "models/gibs/antlion_gib_small_3.mdl"
 
 	-- Clean Up.
 	if GetConVar("ph_use_custom_plmodel"):GetBool() then
@@ -281,7 +288,11 @@ end
 
 -- Called when player presses [F3]. Plays a taunt for their team
 function GM:ShowSpare1(pl)
-	if GAMEMODE:InRound() && pl:Alive() && (pl:Team() == TEAM_HUNTERS || pl:Team() == TEAM_PROPS) && pl.last_taunt_time + TAUNT_DELAY <= CurTime() && #PROP_TAUNTS > 1 && #HUNTER_TAUNTS > 1 then
+	if GetConVar("ph_enable_custom_taunts"):GetBool() && GAMEMODE:InRound() then
+		pl:ConCommand("ph_showtaunts")
+	end
+	
+	if !GetConVar("ph_enable_custom_taunts"):GetBool() && GAMEMODE:InRound() && pl:Alive() && (pl:Team() == TEAM_HUNTERS || pl:Team() == TEAM_PROPS) && pl.last_taunt_time + TAUNT_DELAY <= CurTime() && #PROP_TAUNTS > 1 && #HUNTER_TAUNTS > 1 then
 		repeat
 			if pl:Team() == TEAM_HUNTERS then
 				rand_taunt = table.Random(HUNTER_TAUNTS)
@@ -302,7 +313,6 @@ function PlayerDisconnected(pl)
 	pl:RemoveProp()
 end
 hook.Add("PlayerDisconnected", "PH_PlayerDisconnected", PlayerDisconnected)
-
 
 -- Called when the players spawns
 function PlayerSpawn(pl)
@@ -334,6 +344,7 @@ function RoundEnd()
 	for _, pl in pairs(team.GetPlayers(TEAM_HUNTERS)) do
 		pl:Blind(false)
 		pl:UnLock()
+		pl:SetModelScale(1)
 	end
 end
 hook.Add("RoundEnd", "PH_RoundEnd", RoundEnd)
@@ -392,10 +403,11 @@ end
 
 -- Called every server tick.
 function GM:Think()
+	-- Prop Rotation
 	for _, pl in pairs(team.GetPlayers(TEAM_PROPS)) do
 		if GetConVar("ph_better_prop_movement"):GetBool() then
 			if pl && pl:IsValid() && pl:Alive() && pl.ph_prop && pl.ph_prop:IsValid() then
-				if (pl.ph_prop:GetModel() == "models/player/kleiner.mdl") || table.HasValue(ADDITIONAL_STARTING_MODELS, pl.ph_prop:GetModel()) then
+				if pl.ph_prop:GetModel() == "models/player/kleiner.mdl" then
 					pl.ph_prop:SetPos(pl:GetPos())
 				else
 					pl.ph_prop:SetPos(pl:GetPos() - Vector(0, 0, pl.ph_prop:OBBMins().z))
@@ -406,17 +418,40 @@ function GM:Think()
 			end
 		end
 	end
+	
+	-- Extra check here for changes cvars
+	if UPDATE_CVAR_TO_VARIABLE < CurTime() then
+		-- Update camera collisions variable
+		net.Start("PH_CameraCollisions")
+			net.WriteBool(GetConVar("ph_prop_camera_collisions"):GetBool())
+		net.Broadcast()
+		
+		-- Update camera collisions variable
+		net.Start("PH_CustomTauntEnabled")
+			net.WriteBool(GetConVar("ph_enable_custom_taunts"):GetBool())
+		net.Broadcast()
+		
+		-- Update custom taunt delay variable
+		net.Start("PH_CustomTauntDelay")
+			net.WriteInt(GetConVarNumber("ph_customtaunts_delay"), 8) -- 8 bits so we don't send too much information here
+		net.Broadcast()
+		
+		-- Make sure to update every so seconds and not constantly
+		UPDATE_CVAR_TO_VARIABLE = CurTime() + UPDATE_CVAR_TO_VARIABLE_ADD
+	end
 end
 
 -- Bonus Drop :D
 function PH_Props_OnBreak(ply, ent)
-	local pos = ent:GetPos()
-	if math.random() < 0.08 then -- 0.8% Chance of drops.
-		local dropent = ents.Create("ph_luckyball")
-		dropent:SetPos(Vector(pos.x, pos.y, pos.z + 32)) -- to make sure the Lucky Ball didn't fall underground and if the Prop's Center Origin is near underground, they'll spawn with extra +32 hammer unit.
-		dropent:SetAngles(Angle(0,0,0))
-		dropent:SetColor(Color(math.Round(math.random(0,255)),math.Round(math.random(0,255)),math.Round(math.random(0,255)),255))
-		dropent:Spawn()
+	if GetConVar("ph_enable_lucky_balls"):GetBool() then
+		local pos = ent:GetPos()
+		if math.random() < 0.08 then -- 0.08% Chance of drops.
+			local dropent = ents.Create("ph_luckyball")
+			dropent:SetPos(Vector(pos.x, pos.y, pos.z + 32)) -- to make sure the Lucky Ball didn't fall underground and if the Prop's Center Origin is near underground, they'll spawn with extra +32 hammer unit.
+			dropent:SetAngles(Angle(0,0,0))
+			dropent:SetColor(Color(math.Round(math.random(0,255)),math.Round(math.random(0,255)),math.Round(math.random(0,255)),255))
+			dropent:Spawn()
+		end
 	end
 end
 hook.Add("PropBreak", "Props_OnBreak_WithDrops", PH_Props_OnBreak)
@@ -443,7 +478,6 @@ function GM:PlayerSwitchFlashlight(pl, on)
 	
 	return false
 end
-
 
 -- Player pressed a key
 function PlayerPressedKey(pl, key)
