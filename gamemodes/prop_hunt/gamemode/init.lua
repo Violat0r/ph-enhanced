@@ -325,7 +325,7 @@ function PlayerSpawn(pl)
 	pl:Blind(false)
 	pl:RemoveProp()
 	pl:RemoveClientProp()
-	pl:SetColor( Color(255, 255, 255, 255))
+	pl:SetColor(Color(255, 255, 255, 255))
 	pl:SetRenderMode( RENDERMODE_TRANSALPHA )
 	pl:UnLock()
 	pl:ResetHull()
@@ -338,6 +338,13 @@ function PlayerSpawn(pl)
 	umsg.End()
 	
 	pl:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	
+	-- Do something with jump power
+	if pl:Team() == TEAM_HUNTERS then
+		pl:SetJumpPower(160)
+	elseif pl:Team() == TEAM_PROPS then
+		pl:SetJumpPower(160 * 1.4)
+	end
 end
 hook.Add("PlayerSpawn", "PH_PlayerSpawn", PlayerSpawn)
 

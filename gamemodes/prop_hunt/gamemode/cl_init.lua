@@ -107,12 +107,10 @@ end
 -- Draw round timeleft and hunter release timeleft
 function HUDPaint()
 	-- Draw text with ph_cl_plhalos
-	if CL_PLHALOS_SERVERENABLED && GetConVar("ph_cl_plhalos"):GetBool() then
+	if CL_PLHALOS_SERVERENABLED && GetConVar("ph_cl_plhalos"):GetBool() && GetConVar("ph_cl_pltext"):GetBool() then
 		for _, pl in pairs(player.GetAll()) do
 			if pl != LocalPlayer() && (pl && pl:IsValid() && pl:Alive() && pl:Team() == LocalPlayer():Team() && !pl:IsLineOfSightClear(LocalPlayer())) then
-				if pl:LookupBone("ValveBiped.Bip01_Head1") then
-					draw.DrawText(pl:Name(), "TargetID", (pl:GetBonePosition(pl:LookupBone("ValveBiped.Bip01_Head1")) + Vector(0, 0, 32)):ToScreen().x, (pl:GetBonePosition(pl:LookupBone("ValveBiped.Bip01_Head1")) + Vector(0, 0, 32)):ToScreen().y, team.GetColor(pl:Team()), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-				else
+				if ((GetConVarNumber("ph_cl_pltext") == 1) && (team.NumPlayers(LocalPlayer():Team()) > GetConVarNumber("ph_cl_plhalos"))) || (GetConVarNumber("ph_cl_pltext") >= 2) then
 					draw.DrawText(pl:Name(), "TargetID", (pl:EyePos() + Vector(0, 0, 32)):ToScreen().x, (pl:EyePos() + Vector(0, 0, 32)):ToScreen().y, team.GetColor(pl:Team()), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				end
 			end
@@ -175,6 +173,7 @@ function Initialize()
 	
 	CreateClientConVar("ph_cl_halos", "1", true, true, "Toggle Enable/Disable Halo effects when choosing a prop.")
 	CreateClientConVar("ph_cl_plhalos", "8", true, false, "Toggle Enable/Disable Halo effects on players & disable automatically if over this limit.")
+	CreateClientConVar("ph_cl_pltext", "1", true, false, "Options for Text above players when ph_cl_plhalos is enabled. 0 = Disabled. 1 = Enable/Disable dynamically. 2 = Enable all the time.")
 	
 	-- Just like the server constant
 	USABLE_PROP_ENTITIES_CL = {

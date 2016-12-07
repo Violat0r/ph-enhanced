@@ -155,7 +155,9 @@ PROP_TAUNTS = {
 }
 
 -- Custom Player Model bans for props
-PROP_PLMODEL_BANS = {}
+PROP_PLMODEL_BANS = {
+	"models/player.mdl"
+}
 
 -- Add custom taunts, if any. See taunts/prop_taunts.lua or taunts/hunter_taunts.lua for more info.
 local function AddDemTaunt()
@@ -186,3 +188,36 @@ local function AddDemTaunt()
 	end
 end
 AddDemTaunt()
+
+-- Add the custom player model bans for props
+local function AddBadPLModels()
+
+	-- Create base config area
+	if ( !file.Exists( "prop_hunt-enhanced", "DATA" ) ) then
+	
+		file.CreateDir( "prop_hunt-enhanced" )
+	
+	end
+
+	-- Create actual config
+	if ( !file.Exists( "prop_hunt-enhanced/prop_playermodel_bans.txt", "DATA" ) ) then
+	
+		file.Write("prop_hunt-enhanced/prop_playermodel_bans.txt", util.TableToJSON(PROP_PLMODEL_BANS, true))
+	
+	end
+
+	-- Check and make sure the file still exists in case something caused it to not be created
+	if ( file.Exists( "prop_hunt-enhanced/prop_playermodel_bans.txt", "DATA" ) ) then
+	
+		local PROP_PLMODEL_BANS_READ = util.JSONToTable( file.Read( "prop_hunt-enhanced/prop_playermodel_bans.txt", "DATA" ) )
+		for k, v in pairs(PROP_PLMODEL_BANS_READ) do
+			if !table.HasValue(PROP_PLMODEL_BANS, string.lower(v)) then
+				printverbose("[PH: Enhanced] Adding custom prop model ban: "..string.lower(v))
+				table.insert(PROP_PLMODEL_BANS, string.lower(v))
+			end
+		end
+	
+	end
+
+end
+AddBadPLModels()
