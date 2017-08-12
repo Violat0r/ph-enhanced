@@ -478,11 +478,11 @@ function GM:FindLeastCommittedPlayerOnTeam( teamid )
 	
 end
 
-function GM:OnEndOfGame(bGamemodeVote)
+function GM:OnEndOfGame(CMV_Start)
 
 	for k,v in pairs( player.GetAll() ) do
 
-		v:Freeze(true)
+		--v:Freeze(true)
 		v:ConCommand( "+showscores" )
 		
 	end
@@ -490,20 +490,20 @@ function GM:OnEndOfGame(bGamemodeVote)
 end
 
 // Override OnEndOfGame to do any other stuff. like winning music.
-function GM:EndOfGame( bGamemodeVote )
+function GM:EndOfGame( CMV_Start )
 
 	if GAMEMODE.IsEndOfGame then return end
 
 	GAMEMODE.IsEndOfGame = true
 	SetGlobalBool( "IsEndOfGame", true );
 	
-	gamemode.Call("OnEndOfGame", bGamemodeVote);
+	gamemode.Call("OnEndOfGame", CMV_Start);
 	
-	if ( bGamemodeVote ) then
+	if ( CMV_Start ) then
 	
 		MsgN( "Starting gamemode voting..." )
 		PrintMessage( HUD_PRINTTALK, "Starting gamemode voting..." );
-		timer.Simple( GAMEMODE.VotingDelay, function() MapVote.Start() end )
+		timer.Simple( GAMEMODE.VotingDelay, function() CMV:Start() end )
 		
 	end
 
