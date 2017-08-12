@@ -51,7 +51,7 @@ function ph_BaseMainWindow(ply, cmd, args)
 		butt:SetSize(128,32)
 		butt:SetText("Server Rules/MOTD")
 		butt.DoClick = function()
-			ply:ConCommand("ulx motd")
+			ply:ConCommand("lunera_motd")
 			frm:Close()
 		end
 		
