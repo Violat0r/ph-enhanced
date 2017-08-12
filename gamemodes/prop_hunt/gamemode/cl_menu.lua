@@ -257,7 +257,7 @@ function ph_BaseMainWindow(ply, cmd, args)
 	-- Call All Functions, but Admin (must check by serverside user rights from sv_admin.lua)
 	Ph:HelpSelections()
 	Ph:PlayerMuteFunction()
-	Ph:PlayerModelSelections()
+	--Ph:PlayerModelSelections()
 	
 	-- Custom Hook Menu here. Give 1 second for better safe-calling...
 	timer.Simple(1, function()
